@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				font-size: 16px;
+				padding: 20px;
+			}
+
+			.style-selector {
+				width: 300px;
+				height: 40px;
+				font-size: 16px;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid gray;
+			}
+
+			.note {
+				font-size: 14px;
+				color: gray;
+				margin-bottom: 20px;
+			}
+
+			.input {
+				width: 100%;
+				height: 200px;
+				font-size: 16px;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid gray;
+			}
+
+			.transform-button {
+				width: 150px;
+				height: 40px;
+				font-size: 16px;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid gray;
+				background-color: lightblue;
+				color: white;
+				cursor: pointer;
+			}
+
+			.result {
+				width: 100%;
+				height: 320px;
+				font-size: 16px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid gray;
+				background-color: lightgray;
+				overflow-y: scroll;
+			}
+		</style>
+		<script id="mathMLTransform" type="text/xsl">
+			<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+			   <xsl:output method="xml" indent="yes"/>
+
+			            <xsl:template match="/">
+			             <math xmlns="http://www.w3.org/1998/Math/MathML">
+			               <xsl:apply-templates />
+			             </math>
+			           </xsl:template>
+
+			   <xsl:template match="строка">
+			      <mrow>
+			         <xsl:apply-templates select="*"/>
+			      </mrow>
+			   </xsl:template>
+
+			   <xsl:template match="операнд">
+			      <mi>
+			         <xsl:value-of select="." />
+			      </mi>
+			   </xsl:template>
+
+			   <xsl:template match="оператор">
+			      <mo>
+			         <xsl:value-of select="." />
+			      </mo>
+			   </xsl:template>
+
+			   <xsl:template match="число">
+			      <mn>
+			         <xsl:value-of select="." />
+			      </mn>
+			   </xsl:template>
+
+			   <xsl:template match="дробь">
+			      <mfrac>
+			         <xsl:apply-templates select="*"/>
+			      </mfrac>
+			   </xsl:template>
+
+			   <xsl:template match="низверх">
+			      <msub>
+			         <xsl:apply-templates select="*"/>
+			      </msub>
+			   </xsl:template>
+
+			   <xsl:template match="верх">
+			      <msup>
+			         <xsl:apply-templates select="*"/>
+			      </msup>
+			   </xsl:template>
+
+			   <xsl:template match="низ">
+			      <msub>
+			         <xsl:apply-templates select="*"/>
+			      </msub>
+			   </xsl:template>
+
+			</xsl:stylesheet>
+		</script>
+		<script id="SVGTransform" type="text/xsl">
+						<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+			  <xsl:output method="xml" indent="yes"/>
+
+			  <xsl:template match="root">
+			    <svg width="{графика/@ширина}" height="{графика/@высота}">
+			      <xsl:apply-templates select="графика/эллипс"/>
+			    </svg>
+			  </xsl:template>
+
+			  <xsl:template match="эллипс">
+			    <ellipse id="{@id}" fill="{@заливка}" stroke="{@ободок}" stroke-width="{@ширина-ободка}" cx="{@cx}" cy="{@cy}" rx="{@rx}" ry="{@ry}"/>
+			  </xsl:template>
+			</xsl:stylesheet>
+		</script>
+		<script>
+			function transform(xsltStylesheetId) {
+				var xsltStylesheet = document.getElementById(xsltStylesheetId).textContent;
+				var parser = new DOMParser();
+				var xsltStylesheetNode = parser.parseFromString(xsltStylesheet, 'text/xml');
+
+				var xsltProcessor = new XSLTProcessor();
+				xsltProcessor.importStylesheet(xsltStylesheetNode);
+
+				var xmlString = document.getElementById('xmlDocument').value;
+				var xmlDocument = parser.parseFromString(xmlString, 'text/xml');
+
+				var transformedString = new XMLSerializer().serializeToString(
+					xsltProcessor.transformToDocument(xmlDocument),
+				);
+
+				document.getElementById('transformedResult').innerHTML = transformedString;
+			}
+		</script>
+	</head>
+	<body>
+		<select id="xsltStylesheetSelect" class="style-selector">
+			<option value="mathMLTransform">Math ML transformation</option>
+			<option value="SVGTransform">SVG Transformation</option>
+		</select>
+		<br />
+		<div class="note">Для работы MathML необходима версия Chrome 109 или выше</div>
+		<textarea id="xmlDocument" rows="10" cols="80" class="input"></textarea><br />
+		<button onclick="transform(document.getElementById('xsltStylesheetSelect').value)" class="transform-button">Transform</button
+		><br />
+		<pre id="transformedResult" class="result"></pre>
+	</body>
+</html>
