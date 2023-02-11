@@ -81,6 +81,12 @@
 			             </math>
 			           </xsl:template>
 
+				<xsl:template match="корень">
+			      <msqrt>
+			         <xsl:apply-templates select="*"/>
+			      </msqrt>
+			   </xsl:template>
+
 			   <xsl:template match="строка">
 			      <mrow>
 			         <xsl:apply-templates select="*"/>
@@ -112,9 +118,9 @@
 			   </xsl:template>
 
 			   <xsl:template match="низверх">
-			      <msub>
+			      <munderover>
 			         <xsl:apply-templates select="*"/>
-			      </msub>
+			      </munderover>
 			   </xsl:template>
 
 			   <xsl:template match="верх">
