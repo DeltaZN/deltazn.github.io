@@ -47,6 +47,19 @@
 				cursor: pointer;
 			}
 
+            .insert-button {
+				width: 150px;
+				height: 40px;
+				font-size: 16px;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid gray;
+				background-color: blue;
+				color: white;
+				cursor: pointer;
+			}
+
 			.result {
 				width: 100%;
 				height: 320px;
@@ -119,7 +132,7 @@
 			</xsl:stylesheet>
 		</script>
 		<script id="SVGTransform" type="text/xsl">
-						<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+			            <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			  <xsl:output method="xml" indent="yes"/>
 
 			  <xsl:template match="root">
@@ -133,19 +146,92 @@
 			  </xsl:template>
 			</xsl:stylesheet>
 		</script>
+		<script id="MathMLTransform_XML" type="text/xml"><строка>
+ <операнд>σ</операнд>
+ <оператор>=</оператор>
+ <корень>
+ <строка>
+ <дробь>
+ <строка>
+ <число>1</число>
+ </строка>
+ <строка>
+ <операнд>N</операнд>
+ </строка>
+ </дробь>
+ <строка>
+ <низверх>
+ <строка>
+ <оператор>∑</оператор>
+ </строка>
+ <строка>
+ <операнд>i</операнд>
+ <оператор>=</оператор>
+ <число>1</число>
+ </строка>
+ <строка>
+ <операнд>N</операнд>
+ </строка>
+ </низверх>
+ <строка>
+ <верх>
+ <строка>
+ <оператор >(</оператор>
+ <низ>
+ <строка>
+ <операнд>x</операнд>
+ </строка>
+ <строка>
+ <операнд>i</операнд>
+ </строка>
+ </низ>
+ <оператор>−</оператор>
+ <операнд>μ</операнд>
+ <оператор >)</оператор>
+ </строка>
+ <строка>
+ <число>2</число>
+ </строка>
+ </верх>
+ </строка>
+ </строка>
+ </строка>
+ </корень>
+ <оператор>.</оператор>
+</строка>
+		</script>
+		<script id="SVGTransform_XML" type="text/xml"><root>
+ <графика ширина="640" высота="480">
+ <эллипс id="графика_1" заливка="rgba(255,0,0,0.5)" ободок="white" ширина-ободка="5" cx="206" cy="139" rx="100" ry="100"/>
+ <эллипс id="графика_2" заливка="rgba(0,0,255,0.5)" ободок="white" ширина-ободка="5" cx="108" cy="111" rx="100" ry="100"/>
+ <эллипс id="графика_3" заливка="rgba(0,255,0,0.5)" ободок="white" ширина-ободка="5" cx="134" cy="215" rx="100" ry="100"/>
+ </графика>
+</root>
+		</script>
 		<script>
-			function transform(xsltStylesheetId) {
-				var xsltStylesheet = document.getElementById(xsltStylesheetId).textContent;
-				var parser = new DOMParser();
-				var xsltStylesheetNode = parser.parseFromString(xsltStylesheet, 'text/xml');
+			function insertMathML() {
+				const xml = document.getElementById('MathMLTransform_XML').textContent;
+				document.getElementById('xmlDocument').value = xml;
+				document.getElementById('xsltStylesheetSelect').value = 'mathMLTransform';
+			}
+			function insertSVG() {
+				const xml = document.getElementById('SVGTransform_XML').textContent;
+				document.getElementById('xmlDocument').value = xml;
+				document.getElementById('xsltStylesheetSelect').value = 'SVGTransform';
+			}
 
-				var xsltProcessor = new XSLTProcessor();
+			function transform(xsltStylesheetId) {
+				const xsltStylesheet = document.getElementById(xsltStylesheetId).textContent;
+				const parser = new DOMParser();
+				const xsltStylesheetNode = parser.parseFromString(xsltStylesheet, 'text/xml');
+
+				const xsltProcessor = new XSLTProcessor();
 				xsltProcessor.importStylesheet(xsltStylesheetNode);
 
-				var xmlString = document.getElementById('xmlDocument').value;
-				var xmlDocument = parser.parseFromString(xmlString, 'text/xml');
+				const xmlString = document.getElementById('xmlDocument').value;
+				const xmlDocument = parser.parseFromString(xmlString, 'text/xml');
 
-				var transformedString = new XMLSerializer().serializeToString(
+				const transformedString = new XMLSerializer().serializeToString(
 					xsltProcessor.transformToDocument(xmlDocument),
 				);
 
@@ -161,8 +247,12 @@
 		<br />
 		<div class="note">Для работы MathML необходима версия Chrome 109 или выше</div>
 		<textarea id="xmlDocument" rows="10" cols="80" class="input"></textarea><br />
-		<button onclick="transform(document.getElementById('xsltStylesheetSelect').value)" class="transform-button">Transform</button
-		><br />
+        <button onclick="insertMathML()" class="insert-button">Insert MathML</button>
+		<button onclick="insertSVG()" class="insert-button">Insert SVG</button>
+		<button onclick="transform(document.getElementById('xsltStylesheetSelect').value)" class="transform-button">
+			Transform
+        </button>
+		<br />
 		<pre id="transformedResult" class="result"></pre>
 	</body>
 </html>
